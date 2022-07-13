@@ -1,0 +1,8 @@
+streamlit
+numpy
+pandas
+nsepy
+dfply
+datetime
+requests
+json
