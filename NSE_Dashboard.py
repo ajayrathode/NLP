@@ -77,6 +77,48 @@ with st.form("input_form"):
     if submitted:
         # st.write("symb", symb, "date", select_date)
         st.write("")
+        st.write("#")
+        st.subheader('Stock Price Data')
+        price_date = price_data("SBIN",select_date) #datetime.date(2020,1,1))
+        price_date.drop(['Symbol','Series','Prev Close','Turnover'], axis=1, inplace= True)
+        price_date= price_date >> mutate(Spike=100*(X.High - X.Low)/X.Low)
+        st.write(price_date)
+
+        temp= announcements("INFY",  select_date,cookievalue) #"01-06-2022"
+        temp.drop(['symbol','sm_name'], axis=1, inplace= True)
+        # CSS to inject contained in a string
+        hide_table_row_index = """
+            <style>
+            tbody th {display:none}
+            .blank {display:none}
+            </style>
+            """
+
+        import numpy as np
+        marketstart = datetime.time(9, 30)
+        marketend = datetime.time(15, 30)
+        temp['an_dt']= pd.to_datetime(temp['an_dt'])
+        temp['MarketTime_color'] = np.where( temp['an_dt'].dt.time <= marketstart , False, True)
+        temp['MarketTime_color'] = np.where( temp['an_dt'].dt.time >= marketend , False, True)
+
+        Color_green= np.where(temp['MarketTime_color'] ==True)
+        temp.sort_values(by='an_dt', ascending=True, inplace=True)
+        temp_bk=temp.copy() 
+        # Color_red= np.where(temp['Record B'] !=temp['Record A'])
+
+        # temp['attchmntFile'] = temp['attchmntFile'].apply(make_clickable)
+        # temp = temp.to_html(escape=False)
+        st.write("#")
+        st.write("#")
+        st.subheader('Corporate Announcements')
+        st.dataframe(temp.style.set_properties(subset = pd.IndexSlice[Color_green[0].tolist(), :], **{'background-color' : 'lightgreen'}).hide_index()) #.set_properties(subset = pd.IndexSlice[Color_red[0].tolist(), :], **{'background-color' : 'lightyellow'}).hide_index())
+
+        st.write("#")
+        temp_bk.drop(['MarketTime_color','desc','attchmntText'], axis=1, inplace= True)
+        temp_bk['attchmntFile'] = temp_bk['attchmntFile'].apply(make_clickable)
+        temp_bk = temp_bk.to_html(escape=False)
+        st.write(temp_bk, unsafe_allow_html=True)
+
 
         # price_date = price_data("SBIN",select_date) #datetime.date(2020,1,1))
         # price_date.drop(['Symbol','Series','Prev Close','Turnover'], axis=1, inplace= True)
@@ -141,44 +183,53 @@ with st.form("input_form"):
 
 # temp= announcements("INFY",  "01-06-2022", "13-06-2022","")
 # st.write(temp)
-st.write("#")
-st.subheader('Stock Price Data')
-price_date = price_data("SBIN",select_date) #datetime.date(2020,1,1))
-price_date.drop(['Symbol','Series','Prev Close','Turnover'], axis=1, inplace= True)
-price_date= price_date >> mutate(Spike=100*(X.High - X.Low)/X.Low)
-st.write(price_date)
 
-temp= announcements("INFY",  select_date,cookievalue) #"01-06-2022"
-temp.drop(['symbol','sm_name'], axis=1, inplace= True)
-# CSS to inject contained in a string
-hide_table_row_index = """
-    <style>
-    tbody th {display:none}
-    .blank {display:none}
-    </style>
-    """
 
-import numpy as np
-marketstart = datetime.time(9, 30)
-marketend = datetime.time(15, 30)
-temp['an_dt']= pd.to_datetime(temp['an_dt'])
-temp['MarketTime_color'] = np.where( temp['an_dt'].dt.time <= marketstart , False, True)
-temp['MarketTime_color'] = np.where( temp['an_dt'].dt.time >= marketend , False, True)
 
-Color_green= np.where(temp['MarketTime_color'] ==True)
-temp.sort_values(by='an_dt', ascending=True, inplace=True)
-temp_bk=temp.copy() 
-# Color_red= np.where(temp['Record B'] !=temp['Record A'])
 
-# temp['attchmntFile'] = temp['attchmntFile'].apply(make_clickable)
-# temp = temp.to_html(escape=False)
-st.write("#")
-st.write("#")
-st.subheader('Corporate Announcements')
-st.dataframe(temp.style.set_properties(subset = pd.IndexSlice[Color_green[0].tolist(), :], **{'background-color' : 'lightgreen'}).hide_index()) #.set_properties(subset = pd.IndexSlice[Color_red[0].tolist(), :], **{'background-color' : 'lightyellow'}).hide_index())
 
-st.write("#")
-temp_bk.drop(['MarketTime_color','desc','attchmntText'], axis=1, inplace= True)
-temp_bk['attchmntFile'] = temp_bk['attchmntFile'].apply(make_clickable)
-temp_bk = temp_bk.to_html(escape=False)
-st.write(temp_bk, unsafe_allow_html=True)
+
+
+
+#####Separate UI
+# st.write("#")
+# st.subheader('Stock Price Data')
+# price_date = price_data("SBIN",select_date) #datetime.date(2020,1,1))
+# price_date.drop(['Symbol','Series','Prev Close','Turnover'], axis=1, inplace= True)
+# price_date= price_date >> mutate(Spike=100*(X.High - X.Low)/X.Low)
+# st.write(price_date)
+
+# temp= announcements("INFY",  select_date,cookievalue) #"01-06-2022"
+# temp.drop(['symbol','sm_name'], axis=1, inplace= True)
+# # CSS to inject contained in a string
+# hide_table_row_index = """
+#     <style>
+#     tbody th {display:none}
+#     .blank {display:none}
+#     </style>
+#     """
+
+# import numpy as np
+# marketstart = datetime.time(9, 30)
+# marketend = datetime.time(15, 30)
+# temp['an_dt']= pd.to_datetime(temp['an_dt'])
+# temp['MarketTime_color'] = np.where( temp['an_dt'].dt.time <= marketstart , False, True)
+# temp['MarketTime_color'] = np.where( temp['an_dt'].dt.time >= marketend , False, True)
+
+# Color_green= np.where(temp['MarketTime_color'] ==True)
+# temp.sort_values(by='an_dt', ascending=True, inplace=True)
+# temp_bk=temp.copy() 
+# # Color_red= np.where(temp['Record B'] !=temp['Record A'])
+
+# # temp['attchmntFile'] = temp['attchmntFile'].apply(make_clickable)
+# # temp = temp.to_html(escape=False)
+# st.write("#")
+# st.write("#")
+# st.subheader('Corporate Announcements')
+# st.dataframe(temp.style.set_properties(subset = pd.IndexSlice[Color_green[0].tolist(), :], **{'background-color' : 'lightgreen'}).hide_index()) #.set_properties(subset = pd.IndexSlice[Color_red[0].tolist(), :], **{'background-color' : 'lightyellow'}).hide_index())
+
+# st.write("#")
+# temp_bk.drop(['MarketTime_color','desc','attchmntText'], axis=1, inplace= True)
+# temp_bk['attchmntFile'] = temp_bk['attchmntFile'].apply(make_clickable)
+# temp_bk = temp_bk.to_html(escape=False)
+# st.write(temp_bk, unsafe_allow_html=True)
