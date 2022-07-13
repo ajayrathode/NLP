@@ -4,5 +4,3 @@ pandas
 nsepy
 dfply
 datetime
-requests
-json
