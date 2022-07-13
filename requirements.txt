@@ -3,4 +3,3 @@ numpy
 pandas
 nsepy
 dfply
-datetime
